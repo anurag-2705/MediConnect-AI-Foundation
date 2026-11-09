@@ -1,0 +1,9 @@
+node_modules/
+.expo/
+dist/
+__pycache__/
+.venv/
+.env
+.env.*
+!.env.example
+.DS_Store
