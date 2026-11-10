@@ -2,18 +2,17 @@
   "expo": {
     "name": "MediConnect AI",
     "slug": "mediconnect-ai",
-    "version": "0.2.0",
+    "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
-    "plugins": ["expo-secure-store"],
-    "ios": {
-      "supportsTablet": false
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#f7faf9"
     },
+    "ios": { "supportsTablet": false },
     "android": {
       "package": "org.mediconnect.ruralhealth",
-      "adaptiveIcon": {
-        "backgroundColor": "#f7faf9"
-      }
+      "adaptiveIcon": { "backgroundColor": "#f7faf9" }
     }
   }
 }

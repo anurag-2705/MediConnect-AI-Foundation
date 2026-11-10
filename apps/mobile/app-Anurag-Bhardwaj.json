@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "MediConnect AI",
+    "slug": "mediconnect-ai",
+    "version": "0.2.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "plugins": ["expo-secure-store"],
+    "ios": {
+      "supportsTablet": false
+    },
+    "android": {
+      "package": "org.mediconnect.ruralhealth",
+      "adaptiveIcon": {
+        "backgroundColor": "#f7faf9"
+      }
+    }
+  }
+}
