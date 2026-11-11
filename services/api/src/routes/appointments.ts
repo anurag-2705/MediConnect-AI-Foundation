@@ -9,7 +9,130 @@ const router = Router();
 router.use(authenticate);
 
 // ========================================
-// 1. PATIENT REQUESTS AN APPOINTMENT
+// 1. GET AVAILABLE APPOINTMENT SLOTS
+// ========================================
+
+router.get(
+  "/available-slots",
+  requireRole("patient"),
+  async (req, res) => {
+    const schema = z.object({
+      doctorProfileId: z.string().uuid(),
+      date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/)
+    });
+
+    const parsed = schema.safeParse(req.query);
+
+    if (!parsed.success) {
+      return res.status(400).json({
+        error: "Invalid availability request",
+        details: parsed.error.flatten()
+      });
+    }
+
+    const { doctorProfileId, date } = parsed.data;
+
+    try {
+      const doctor = await query(
+        `SELECT d.id, d.timezone_name
+         FROM doctor_profiles d
+         JOIN users u ON u.id = d.user_id
+         WHERE d.id = $1
+           AND d.verification_status = 'verified'
+           AND u.status = 'active'`,
+        [doctorProfileId]
+      );
+
+      if (!doctor.rowCount) {
+        return res.status(404).json({
+          error: "Verified doctor not found"
+        });
+      }
+
+      const timezone = doctor.rows[0].timezone_name;
+
+      const result = await query(
+        `WITH periods AS (
+           SELECT
+             (($2::date + a.start_time)
+               AT TIME ZONE $3) AS period_start,
+
+             (($2::date + a.end_time)
+               AT TIME ZONE $3) AS period_end
+
+           FROM doctor_weekly_availability a
+
+           WHERE a.doctor_profile_id = $1
+             AND a.day_of_week =
+                 EXTRACT(ISODOW FROM $2::date)::integer
+             AND a.is_active = TRUE
+         ),
+
+         slots AS (
+           SELECT generated.slot_start
+
+           FROM periods p
+
+           CROSS JOIN LATERAL generate_series(
+             p.period_start,
+             p.period_end - INTERVAL '30 minutes',
+             INTERVAL '30 minutes'
+           ) AS generated(slot_start)
+         )
+
+         SELECT slot_start
+
+         FROM slots s
+
+         WHERE s.slot_start > NOW()
+
+           AND NOT EXISTS (
+             SELECT 1
+             FROM appointment_requests a
+
+             WHERE a.doctor_profile_id = $1
+               AND a.status IN ('pending', 'accepted')
+
+               AND tstzrange(
+                 a.requested_start_at,
+                 a.requested_end_at,
+                 '[)'
+               )
+               &&
+               tstzrange(
+                 s.slot_start,
+                 s.slot_start + INTERVAL '30 minutes',
+                 '[)'
+               )
+           )
+
+         ORDER BY slot_start ASC`,
+        [doctorProfileId, date, timezone]
+      );
+
+      return res.json({
+        doctorProfileId,
+        date,
+        timezone,
+        slotDurationMinutes: 30,
+        count: result.rowCount,
+        slots: result.rows.map(row =>
+          new Date(row.slot_start).toISOString()
+        )
+      });
+
+    } catch (error) {
+      console.error("Available slots retrieval failed:", error);
+
+      return res.status(500).json({
+        error: "Unable to retrieve available appointment slots"
+      });
+    }
+  }
+);
+
+// ========================================
+// 2. PATIENT REQUESTS AN APPOINTMENT
 // ========================================
 
 const appointmentSchema = z.object({
@@ -57,11 +180,82 @@ router.post(
         });
       }
 
-      const appointment = await inTransaction(async client => {
+      const bookingResult = await inTransaction(async client => {
+
+        // 1. Validate doctor's working hours.
+
+        const availabilityCheck = await client.query(
+          `SELECT EXISTS (
+             SELECT 1
+
+             FROM doctor_profiles d
+
+             JOIN users u
+               ON u.id = d.user_id
+
+             JOIN doctor_weekly_availability a
+               ON a.doctor_profile_id = d.id
+
+             CROSS JOIN LATERAL (
+               SELECT
+                 $2::timestamptz
+                 AT TIME ZONE d.timezone_name AS local_start
+             ) candidate
+
+             WHERE d.id = $1
+               AND d.verification_status = 'verified'
+               AND u.status = 'active'
+               AND a.is_active = TRUE
+
+               AND a.day_of_week =
+                   EXTRACT(ISODOW FROM candidate.local_start)::integer
+
+               AND candidate.local_start::date =
+                   (
+                     candidate.local_start
+                     + INTERVAL '30 minutes'
+                   )::date
+
+               AND candidate.local_start::time >= a.start_time
+
+               AND (
+                 candidate.local_start
+                 + INTERVAL '30 minutes'
+               )::time <= a.end_time
+
+               AND MOD(
+                 EXTRACT(
+                   EPOCH FROM (
+                     candidate.local_start -
+                     (
+                       candidate.local_start::date
+                       + a.start_time
+                     )
+                   )
+                 ),
+                 1800
+               ) = 0
+           ) AS is_available`,
+          [data.doctorProfileId, data.requestedStartAt]
+        );
+
+        if (!availabilityCheck.rows[0].is_available) {
+          return {
+            unavailable: true as const
+          };
+        }
+
+        // 2. Create appointment.
+
         const result = await client.query(
           `INSERT INTO appointment_requests
-           (patient_user_id, doctor_profile_id, appointment_type,
-            requested_start_at, reason)
+           (
+             patient_user_id,
+             doctor_profile_id,
+             appointment_type,
+             requested_start_at,
+             reason
+           )
            VALUES ($1, $2, $3, $4, $5)
            RETURNING *`,
           [
@@ -73,6 +267,8 @@ router.post(
           ]
         );
 
+        // 3. Record audit event.
+
         await audit(client, {
           actorUserId: req.auth!.userId,
           action: "appointment.created",
@@ -80,15 +276,32 @@ router.post(
           targetId: String(result.rows[0].id)
         });
 
-        return result.rows[0];
+        return {
+          unavailable: false as const,
+          appointment: result.rows[0]
+        };
       });
+
+      if (bookingResult.unavailable) {
+        return res.status(409).json({
+          error: "The selected time is outside the doctor's available working hours or is not a valid appointment slot."
+        });
+      }
 
       return res.status(201).json({
         message: "Appointment request submitted successfully",
-        appointment
+        appointment: bookingResult.appointment
       });
 
     } catch (error) {
+      const dbError = error as { code?: string };
+
+      if (dbError.code === "23P01") {
+        return res.status(409).json({
+          error: "This doctor already has an appointment during the selected time. Please choose another slot."
+        });
+      }
+
       console.error("Appointment creation failed:", error);
 
       return res.status(500).json({
@@ -99,7 +312,7 @@ router.post(
 );
 
 // ========================================
-// 2. PATIENT VIEWS OWN APPOINTMENTS
+// 3. PATIENT VIEWS OWN APPOINTMENTS
 // ========================================
 
 router.get(
@@ -136,7 +349,7 @@ router.get(
 );
 
 // ========================================
-// 3. DOCTOR VIEWS APPOINTMENT REQUESTS
+// 4. DOCTOR VIEWS APPOINTMENT REQUESTS
 // ========================================
 
 router.get(
@@ -172,7 +385,7 @@ router.get(
 );
 
 // ========================================
-// 4. DOCTOR ACCEPTS OR REJECTS REQUEST
+// 5. DOCTOR ACCEPTS OR REJECTS REQUEST
 // ========================================
 
 const decisionSchema = z.object({
@@ -255,6 +468,14 @@ router.patch(
       });
 
     } catch (error) {
+      const dbError = error as { code?: string };
+
+      if (dbError.code === "23P01") {
+        return res.status(409).json({
+          error: "Cannot accept this appointment because the doctor has another appointment during this time."
+        });
+      }
+
       console.error("Appointment decision failed:", error);
 
       return res.status(500).json({
@@ -265,7 +486,7 @@ router.patch(
 );
 
 // ========================================
-// 5. PATIENT CANCELS APPOINTMENT
+// 6. PATIENT CANCELS APPOINTMENT
 // ========================================
 
 router.patch(

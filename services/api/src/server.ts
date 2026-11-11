@@ -1,54 +1,163 @@
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import helmet from "helmet";
-import { z } from "zod";
+import rateLimit from "express-rate-limit";
+
+import { config } from "./config";
+import { pool } from "./db";
+
+import authRoutes from "./routes/auth";
+import serviceAreaRoutes from "./routes/serviceAreas";
+import doctorRoutes from "./routes/doctors";
+import appointmentRoutes from "./routes/appointments";
 
 const app = express();
-const port = Number(process.env.PORT ?? 4000);
 
 app.disable("x-powered-by");
-app.use(helmet());
-app.use(cors({ origin: process.env.CORS_ORIGIN?.split(",") ?? false }));
-app.use(express.json({ limit: "32kb" }));
 
-app.get("/health", (_req, res) => {
-  res.status(200).json({
-    status: "ok",
-    service: "mediconnect-api",
-    environment: process.env.NODE_ENV ?? "development",
-    timestamp: new Date().toISOString()
-  });
+if (config.trustProxy) {
+  app.set("trust proxy", 1);
+}
+
+app.use(helmet());
+
+app.use(
+  cors({
+    origin: config.corsOrigins.length
+      ? config.corsOrigins
+      : false,
+    credentials: false
+  })
+);
+
+app.use(express.json({ limit: "16kb" }));
+
+// ========================================
+// RATE LIMITING
+// ========================================
+
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 300,
+  standardHeaders: true,
+  legacyHeaders: false
 });
 
-// This endpoint deliberately accepts no patient symptoms or identifiers.
-// It is a readiness boundary for future, clinician-governed modules.
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+app.use(generalLimiter);
+
+// ========================================
+// HEALTH CHECK
+// ========================================
+
+app.get("/health", async (_req, res) => {
+  try {
+    await pool.query("SELECT 1");
+
+    res.status(200).json({
+      status: "ok",
+      service: "mediconnect-api",
+      database: "reachable"
+    });
+
+  } catch {
+    res.status(503).json({
+      status: "degraded",
+      service: "mediconnect-api",
+      database: "unavailable"
+    });
+  }
+});
+
+// ========================================
+// PLATFORM CAPABILITIES
+// ========================================
+
 app.get("/v1/platform/capabilities", (_req, res) => {
   res.json({
-    patientApp: "foundation",
-    healthWorkerWorkspace: "planned",
-    appointments: "planned",
+    patientRegistration: "enabled_after_database_migration",
+    workerOnboarding: "administrator_invitation_only",
+    roleBasedAccess: true,
+    serviceAreaScoping: true,
+    doctorManagement: "enabled",
+    appointments: "enabled",
     teleconsultation: "disabled_until_provider_and_clinical_approval",
     aiClinicalDecisionSupport: "disabled",
-    supportedLocales: ["en", "hi"],
-    dataCollection: "no_patient_data_in_foundation"
+    emergencyDispatch: "not_integrated",
+    patientMedicalRecords: "not_implemented"
   });
 });
 
-const feedbackSchema = z.object({
-  category: z.enum(["usability", "language", "accessibility", "technical"]),
-  message: z.string().trim().min(3).max(500),
-  locale: z.enum(["en", "hi"]).default("en")
+// ========================================
+// API ROUTES
+// ========================================
+
+app.use("/v1/service-areas", serviceAreaRoutes);
+
+app.use("/v1/auth", authLimiter, authRoutes);
+
+app.use("/v1/doctors", doctorRoutes);
+
+app.use("/v1/appointments", appointmentRoutes);
+
+// ========================================
+// 404 HANDLER
+// ========================================
+
+app.use((_req, res) => {
+  res.status(404).json({
+    error: "Route not found"
+  });
 });
 
-app.post("/v1/feedback", (req, res) => {
-  const parsed = feedbackSchema.safeParse(req.body);
-  if (!parsed.success) {
-    return res.status(400).json({ error: "Invalid feedback payload", details: parsed.error.flatten() });
-  }
-  // Foundation mode: do not persist feedback until retention, consent and privacy controls are approved.
-  return res.status(202).json({ accepted: true, stored: false, message: "Feedback endpoint is in non-persistent foundation mode." });
+// ========================================
+// GLOBAL ERROR HANDLER
+// ========================================
+
+app.use((
+  error: unknown,
+  _req: Request,
+  res: Response,
+  _next: NextFunction
+) => {
+  console.error("Unhandled API error:", error);
+
+  res.status(500).json({
+    error: "Internal server error"
+  });
 });
 
-app.listen(port, "0.0.0.0", () => {
-  console.log(`MediConnect API listening on port ${port}`);
+// ========================================
+// START SERVER
+// ========================================
+
+const server = app.listen(config.PORT, "0.0.0.0", () => {
+  console.log(
+    `MediConnect API listening on port ${config.PORT}`
+  );
 });
+
+// ========================================
+// GRACEFUL SHUTDOWN
+// ========================================
+
+async function shutdown(signal: string) {
+  console.info(`${signal} received; shutting down API`);
+
+  server.close(async () => {
+    await pool.end();
+    process.exit(0);
+  });
+
+  setTimeout(() => process.exit(1), 10_000).unref();
+}
+
+process.on("SIGINT", () => void shutdown("SIGINT"));
+
+process.on("SIGTERM", () => void shutdown("SIGTERM"));
