@@ -155,81 +155,70 @@ const strings = {
   },
 
   hi: {
-    title: "à¤®à¥‡à¤¡à¥€à¤•à¤¨à¥‡à¤•à¥à¤Ÿ AI",
-    subtitle:
-      "à¤¸à¥à¤µà¤¾à¤¸à¥à¤¥à¥à¤¯ à¤¸à¥‡à¤µà¤¾, à¤†à¤ªà¤•à¥‡ à¤˜à¤° à¤•à¥‡ à¤•à¤°à¥€à¤¬",
-    language: "à¤­à¤¾à¤·à¤¾",
-    login: "à¤²à¥‰à¤— à¤‡à¤¨",
-    register: "à¤®à¤°à¥€à¤œ à¤•à¤¾ à¤–à¤¾à¤¤à¤¾ à¤¬à¤¨à¤¾à¤à¤",
-    workerInvite:
-      "à¤¸à¥à¤µà¤¾à¤¸à¥à¤¥à¥à¤¯ à¤•à¤¾à¤°à¥à¤¯à¤•à¤°à¥à¤¤à¤¾ à¤•à¥‡ à¤°à¥‚à¤ª à¤®à¥‡à¤‚ à¤œà¥à¤¡à¤¼à¥‡à¤‚",
-    name: "à¤ªà¥‚à¤°à¤¾ à¤¨à¤¾à¤®",
-    phone:
-      "à¤¦à¥‡à¤¶ à¤•à¥‹à¤¡ à¤¸à¤¹à¤¿à¤¤ à¤«à¥‹à¤¨ à¤¨à¤‚à¤¬à¤° (à¤œà¥ˆà¤¸à¥‡ +919876543210)",
-    password: "à¤ªà¤¾à¤¸à¤µà¤°à¥à¤¡ (à¤•à¤® à¤¸à¥‡ à¤•à¤® 12 à¤…à¤•à¥à¤·à¤°)",
-    village: "à¤…à¤ªà¤¨à¤¾ à¤—à¤¾à¤à¤µ à¤šà¥à¤¨à¥‡à¤‚",
-    privacy:
-      "à¤®à¥ˆà¤‚à¤¨à¥‡ à¤µà¤¿à¤•à¤¾à¤¸ à¤¸à¤‚à¤¸à¥à¤•à¤°à¤£ à¤•à¥€ à¤—à¥‹à¤ªà¤¨à¥€à¤¯à¤¤à¤¾ à¤¸à¥‚à¤šà¤¨à¤¾ (à¤®à¤¸à¥Œà¤¦à¤¾) à¤ªà¤¢à¤¼ à¤²à¥€ à¤¹à¥ˆà¥¤",
-    create: "à¤–à¤¾à¤¤à¤¾ à¤¬à¤¨à¤¾à¤à¤",
-    sendCode: "à¤¸à¤¤à¥à¤¯à¤¾à¤ªà¤¨ à¤•à¥‹à¤¡ à¤à¥‡à¤œà¥‡à¤‚",
-    code: "6 à¤…à¤‚à¤•à¥‹à¤‚ à¤•à¤¾ à¤¸à¤¤à¥à¤¯à¤¾à¤ªà¤¨ à¤•à¥‹à¤¡",
-    verify: "à¤«à¥‹à¤¨ à¤¸à¤¤à¥à¤¯à¤¾à¤ªà¤¿à¤¤ à¤•à¤°à¥‡à¤‚",
-    back: "à¤²à¥‰à¤— à¤‡à¤¨ à¤ªà¤° à¤µà¤¾à¤ªà¤¸ à¤œà¤¾à¤à¤",
-    noAccount: "à¤¨à¤ à¤®à¤°à¥€à¤œ à¤¹à¥ˆà¤‚? à¤ªà¤‚à¤œà¥€à¤•à¤°à¤£ à¤•à¤°à¥‡à¤‚",
-    haveAccount:
-      "à¤ªà¤¹à¤²à¥‡ à¤¸à¥‡ à¤–à¤¾à¤¤à¤¾ à¤¹à¥ˆ? à¤²à¥‰à¤— à¤‡à¤¨ à¤•à¤°à¥‡à¤‚",
-    inviteToken: "à¤ªà¥à¤°à¤¶à¤¾à¤¸à¤• à¤¸à¥‡ à¤®à¤¿à¤²à¤¾ à¤†à¤®à¤‚à¤¤à¥à¤°à¤£ à¤Ÿà¥‹à¤•à¤¨",
-    acceptInvite: "à¤†à¤®à¤‚à¤¤à¥à¤°à¤£ à¤¸à¥à¤µà¥€à¤•à¤¾à¤° à¤•à¤°à¥‡à¤‚",
-    rolePatient: "à¤®à¤°à¥€à¤œ",
-    roleWorker: "à¤¸à¤¾à¤®à¥à¤¦à¤¾à¤¯à¤¿à¤• à¤¸à¥à¤µà¤¾à¤¸à¥à¤¥à¥à¤¯ à¤•à¤¾à¤°à¥à¤¯à¤•à¤°à¥à¤¤à¤¾",
-    assignedAreas: "à¤†à¤ªà¤•à¥‡ à¤¨à¤¿à¤°à¥à¤§à¤¾à¤°à¤¿à¤¤ à¤¸à¥‡à¤µà¤¾ à¤•à¥à¤·à¥‡à¤¤à¥à¤°",
-    accountReady:
-      "à¤†à¤ªà¤•à¤¾ à¤–à¤¾à¤¤à¤¾ à¤¸à¤•à¥à¤°à¤¿à¤¯ à¤¹à¥ˆà¥¤",
-    notice:
-      "à¤•à¥‡à¤µà¤² à¤µà¤¿à¤•à¤¾à¤¸ à¤¸à¤‚à¤¸à¥à¤•à¤°à¤£à¥¤ à¤®à¤°à¥€à¤œà¥‹à¤‚ à¤•à¥€ à¤…à¤¸à¤²à¥€ à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ à¤¨ à¤¡à¤¾à¤²à¥‡à¤‚à¥¤",
-    privacyRequired:
-      "à¤†à¤—à¥‡ à¤¬à¤¢à¤¼à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤®à¤¸à¥Œà¤¦à¤¾ à¤—à¥‹à¤ªà¤¨à¥€à¤¯à¤¤à¤¾ à¤¸à¥‚à¤šà¤¨à¤¾ à¤¸à¥à¤µà¥€à¤•à¤¾à¤° à¤•à¤°à¥‡à¤‚à¥¤",
-    loading: "à¤•à¥ƒà¤ªà¤¯à¤¾ à¤ªà¥à¤°à¤¤à¥€à¤•à¥à¤·à¤¾ à¤•à¤°à¥‡à¤‚...",
-    logout: "à¤²à¥‰à¤— à¤†à¤‰à¤Ÿ",
-    noAreas: "à¤•à¥‹à¤ˆ à¤¸à¤•à¥à¤°à¤¿à¤¯ à¤¸à¥‡à¤µà¤¾ à¤•à¥à¤·à¥‡à¤¤à¥à¤° à¤¨à¤¹à¥€à¤‚ à¤®à¤¿à¤²à¤¾à¥¤",
-    noVillage:
-      "à¤¡à¥‡à¤®à¥‹ à¤—à¤¾à¤à¤µ à¤¨à¤¹à¥€à¤‚ à¤®à¤¿à¤²à¤¾à¥¤ API à¤šà¤¾à¤²à¥‚ à¤•à¤°à¥‡à¤‚ à¤”à¤° demo seed command à¤šà¤²à¤¾à¤à¤à¥¤",
-    apiHelp:
-      "à¤…à¤—à¤° à¤†à¤ª à¤…à¤¸à¤²à¥€ à¤«à¥‹à¤¨ à¤ªà¤° à¤šà¤²à¤¾ à¤°à¤¹à¥‡ à¤¹à¥ˆà¤‚, à¤¤à¥‹ EXPO_PUBLIC_API_URL à¤®à¥‡à¤‚ à¤•à¤‚à¤ªà¥à¤¯à¥‚à¤Ÿà¤° à¤•à¤¾ Wi-Fi IP à¤¦à¥‡à¤‚, localhost à¤¨à¤¹à¥€à¤‚à¥।",
-
-    doctors: "Find Doctors",
-    appointments: "My Appointments",
-    doctorRequests: "Appointment Requests",
-    booking: "Book Appointment",
-    noDoctors: "No verified doctors are currently available.",
-    specialization: "Specialization",
-    qualification: "Qualifications",
-    experience: "Experience",
-    languages: "Languages",
-    bookNow: "Request Appointment",
-    appointmentType: "Appointment Type",
-    inPerson: "In Person",
-    video: "Video Consultation",
-    homeVisit: "Home Visit",
-    appointmentDate: "Appointment Date and Time",
+    title: "मेडीकनेक्ट AI",
+    subtitle: "स्वास्थ्य सेवाएँ, आपके घर के करीब",
+    language: "भाषा",
+    login: "लॉग इन करें",
+    register: "मरीज़ का खाता बनाएँ",
+    workerInvite: "स्वास्थ्य कार्यकर्ता के रूप में जुड़ें",
+    name: "पूरा नाम",
+    phone: "देश कोड सहित फ़ोन नंबर (जैसे +919876543210)",
+    password: "पासवर्ड (कम से कम 12 अक्षर)",
+    village: "अपना गाँव चुनें",
+    privacy: "मैंने विकास संबंधी गोपनीयता सूचना का मसौदा पढ़ लिया है।",
+    create: "खाता बनाएँ",
+    sendCode: "सत्यापन कोड भेजें",
+    code: "6 अंकों का सत्यापन कोड",
+    verify: "फ़ोन नंबर सत्यापित करें",
+    back: "लॉग इन पर वापस जाएँ",
+    noAccount: "नया मरीज़? पंजीकरण करें",
+    haveAccount: "पहले से खाता है? लॉग इन करें",
+    inviteToken: "प्रशासक से मिला आमंत्रण टोकन",
+    acceptInvite: "आमंत्रण स्वीकार करें",
+    rolePatient: "मरीज़",
+    roleWorker: "सामुदायिक स्वास्थ्य कार्यकर्ता",
+    assignedAreas: "आपके निर्धारित सेवा क्षेत्र",
+    accountReady: "आपका खाता सक्रिय है।",
+    notice: "यह केवल विकास संस्करण है। वास्तविक मरीज़ों की जानकारी दर्ज न करें। यह ऐप बीमारी का निदान, दवा लिखने, प्राथमिकता तय करने या आपातकालीन सेवाएँ भेजने का काम नहीं करता।",
+    privacyRequired: "आगे बढ़ने के लिए कृपया गोपनीयता सूचना स्वीकार करें।",
+    loading: "कृपया प्रतीक्षा करें...",
+    logout: "लॉग आउट",
+    noAreas: "कोई सक्रिय सेवा क्षेत्र नहीं मिला।",
+    noVillage: "डेमो गाँव नहीं मिला। API शुरू करें और डेमो सीड कमांड चलाएँ।",
+    apiHelp: "यदि आप इस ऐप को फ़ोन पर चला रहे हैं, तो EXPO_PUBLIC_API_URL में localhost की जगह अपने कंप्यूटर का LAN IP डालें।",
+    doctors: "डॉक्टर खोजें",
+    appointments: "मेरी अपॉइंटमेंट",
+    doctorRequests: "अपॉइंटमेंट अनुरोध",
+    booking: "अपॉइंटमेंट बुक करें",
+    noDoctors: "अभी कोई सत्यापित डॉक्टर उपलब्ध नहीं है।",
+    specialization: "विशेषज्ञता",
+    qualification: "योग्यताएँ",
+    experience: "अनुभव",
+    languages: "भाषाएँ",
+    bookNow: "अपॉइंटमेंट का अनुरोध करें",
+    appointmentType: "अपॉइंटमेंट का प्रकार",
+    inPerson: "व्यक्तिगत मुलाकात",
+    video: "वीडियो परामर्श",
+    homeVisit: "घर पर मुलाकात",
+    appointmentDate: "अपॉइंटमेंट की तारीख और समय",
     appointmentDateHint: "2026-11-12T11:00:00+05:30",
-    reason: "Reason for appointment",
-    submitAppointment: "Submit Request",
-    noAppointments: "No appointments found.",
-    pending: "Pending",
-    accepted: "Accepted",
-    rejected: "Rejected",
-    cancelled: "Cancelled",
-    completed: "Completed",
-    cancelAppointment: "Cancel Request",
-    accept: "Accept",
-    reject: "Reject",
-    patient: "Patient",
-    doctor: "Doctor",
-    doctorNote: "Doctor's Note",
-    backHome: "Back to Dashboard",
-    noRequests: "No appointment requests found.",
-    selectedDoctor: "Selected Doctor"
+    reason: "अपॉइंटमेंट का कारण",
+    submitAppointment: "अनुरोध भेजें",
+    noAppointments: "कोई अपॉइंटमेंट नहीं मिला।",
+    pending: "लंबित",
+    accepted: "स्वीकृत",
+    rejected: "अस्वीकृत",
+    cancelled: "रद्द",
+    completed: "पूरा हुआ",
+    cancelAppointment: "अनुरोध रद्द करें",
+    accept: "स्वीकार करें",
+    reject: "अस्वीकार करें",
+    patient: "मरीज़",
+    doctor: "डॉक्टर",
+    doctorNote: "डॉक्टर की टिप्पणी",
+    backHome: "डैशबोर्ड पर वापस जाएँ",
+    noRequests: "कोई अपॉइंटमेंट अनुरोध नहीं मिला।",
+    selectedDoctor: "चुने गए डॉक्टर"
   }
 };
 
@@ -320,6 +309,10 @@ export default function App() {
 
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [doctorRequests, setDoctorRequests] = useState<Appointment[]>([]);
+
+  // Appointment cancellation states
+const [selectedCancellationId, setSelectedCancellationId] = useState("");
+const [cancellationReason, setCancellationReason] = useState("");
 
   const [appointmentType, setAppointmentType] =
     useState<"in_person" | "video" | "home_visit">("in_person");
@@ -769,29 +762,44 @@ const [appointmentReason, setAppointmentReason] = useState("");
   }
 
   async function cancelAppointment(appointmentId: string) {
-    resetMessages();
-    setBusy(true);
+  const reason = cancellationReason.trim();
 
-    try {
-      const result = await apiRequest<{
-        message: string;
-      }>(`/v1/appointments/${appointmentId}/cancel`, {
-        method: "PATCH",
-        headers: authHeaders()
-      });
-
-      setNotice(result.message);
-      await loadPatientAppointments();
-    } catch (e) {
-      setError(
-        e instanceof Error
-          ? e.message
-          : "Unable to cancel appointment"
-      );
-    } finally {
-      setBusy(false);
-    }
+  if (reason.length < 3 || reason.length > 1000) {
+    setError("Please enter a cancellation reason (3â€“1000 characters).");
+    return;
   }
+
+  resetMessages();
+  setBusy(true);
+
+  try {
+    const result = await apiRequest<{
+      message: string;
+    }>(`/v1/appointments/${appointmentId}/cancel`, {
+      method: "PATCH",
+      headers: authHeaders(),
+      body: JSON.stringify({ reason })
+    });
+
+    setNotice(result.message);
+    setSelectedCancellationId("");
+    setCancellationReason("");
+
+    if (user?.role === "clinician") {
+      await loadDoctorRequests();
+    } else {
+      await loadPatientAppointments();
+    }
+  } catch (e) {
+    setError(
+      e instanceof Error
+        ? e.message
+        : "Unable to cancel appointment"
+    );
+  } finally {
+    setBusy(false);
+  }
+}
 
   // =========================================
   // CLINICIAN APPOINTMENT REQUESTS
@@ -1039,7 +1047,7 @@ const [appointmentReason, setAppointmentReason] = useState("");
                   ]}
                 >
                   <Text style={styles.checkboxTick}>
-                    {privacyAccepted ? "✓" : ""}
+                    {privacyAccepted ? "âœ“" : ""}
                   </Text>
                 </View>
 
@@ -1116,7 +1124,7 @@ const [appointmentReason, setAppointmentReason] = useState("");
                   ]}
                 >
                   <Text style={styles.checkboxTick}>
-                    {privacyAccepted ? "✓" : ""}
+                    {privacyAccepted ? "âœ“" : ""}
                   </Text>
                 </View>
 
@@ -1232,7 +1240,7 @@ const [appointmentReason, setAppointmentReason] = useState("");
                         style={styles.areaInfo}
                       >
                         <Text style={styles.areaInfoText}>
-                          {area.name} · {area.level}
+                          {area.name} Â· {area.level}
                         </Text>
                       </View>
                     ))
@@ -1377,7 +1385,7 @@ const [appointmentReason, setAppointmentReason] = useState("");
   onPress={() => setShowDatePicker(true)}
 >
   <Text style={styles.areaText}>
-    📅 {selectedDate.toLocaleDateString("en-IN", {
+    ðŸ“… {selectedDate.toLocaleDateString("en-IN", {
       day: "numeric",
       month: "long",
       year: "numeric"
@@ -1514,15 +1522,51 @@ const [appointmentReason, setAppointmentReason] = useState("");
                     </Text>
                   ) : null}
 
-                  {appointment.status === "pending" && (
-                    <PrimaryButton
-                      label={t.cancelAppointment}
-                      onPress={() =>
-                        cancelAppointment(appointment.id)
-                      }
-                      disabled={busy}
-                    />
-                  )}
+                 {["pending", "accepted"].includes(appointment.status) &&
+  new Date(appointment.requested_start_at).getTime() > Date.now() && (
+    <>
+      {selectedCancellationId !== appointment.id ? (
+        <PrimaryButton
+          label={t.cancelAppointment}
+          onPress={() => {
+            setSelectedCancellationId(appointment.id);
+            setCancellationReason("");
+            resetMessages();
+          }}
+          disabled={busy}
+        />
+      ) : (
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>
+            Cancellation reason
+          </Text>
+
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your reason (minimum 3 characters)"
+            value={cancellationReason}
+            onChangeText={setCancellationReason}
+            multiline
+            maxLength={1000}
+          />
+
+          <PrimaryButton
+            label="Confirm Cancellation"
+            onPress={() => cancelAppointment(appointment.id)}
+            disabled={busy || cancellationReason.trim().length < 3}
+          />
+
+          <TextButton
+            label="Go Back"
+            onPress={() => {
+              setSelectedCancellationId("");
+              setCancellationReason("");
+            }}
+          />
+        </View>
+      )}
+    </>
+  )}
                 </View>
               ))}
 
@@ -1588,7 +1632,6 @@ const [appointmentReason, setAppointmentReason] = useState("");
                           disabled={busy}
                         />
                       </View>
-
                       <View style={styles.decisionButton}>
                         <Pressable
                           onPress={() =>
@@ -1610,6 +1653,49 @@ const [appointmentReason, setAppointmentReason] = useState("");
                       </View>
                     </View>
                   )}
+
+                  {appointment.status === "accepted" &&
+                    new Date(appointment.requested_start_at).getTime() > Date.now() && (
+                      <>
+                        {selectedCancellationId !== appointment.id ? (
+                          <PrimaryButton
+                            label={t.cancelAppointment}
+                            onPress={() => {
+                              setSelectedCancellationId(appointment.id);
+                              setCancellationReason("");
+                              resetMessages();
+                            }}
+                            disabled={busy}
+                          />
+                        ) : (
+                          <View style={styles.card}>
+                            <Text style={styles.cardTitle}>
+                              Cancellation reason
+                            </Text>
+                            <TextInput
+                              style={styles.input}
+                              placeholder="Enter your reason (minimum 3 characters)"
+                              value={cancellationReason}
+                              onChangeText={setCancellationReason}
+                              multiline
+                              maxLength={1000}
+                            />
+                            <PrimaryButton
+                              label="Confirm Cancellation"
+                              onPress={() => cancelAppointment(appointment.id)}
+                              disabled={busy || cancellationReason.trim().length < 3}
+                            />
+                            <TextButton
+                              label="Go Back"
+                              onPress={() => {
+                                setSelectedCancellationId("");
+                                setCancellationReason("");
+                              }}
+                            />
+                          </View>
+                        )}
+                      </>
+                    )}
                 </View>
               ))}
 
