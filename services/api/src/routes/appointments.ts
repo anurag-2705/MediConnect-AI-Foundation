@@ -486,12 +486,16 @@ router.patch(
 );
 
 // ========================================
-// 6. PATIENT CANCELS APPOINTMENT
+// 6. PATIENT / CLINICIAN CANCELS APPOINTMENT
 // ========================================
+
+const cancellationSchema = z.object({
+  reason: z.string().trim().min(3).max(1000)
+});
 
 router.patch(
   "/:appointmentId/cancel",
-  requireRole("patient"),
+  requireRole("patient", "clinician"),
   async (req, res) => {
     const idCheck = z.string().uuid().safeParse(
       String(req.params.appointmentId)
@@ -503,44 +507,128 @@ router.patch(
       });
     }
 
+    const parsed = cancellationSchema.safeParse(req.body);
+
+    if (!parsed.success) {
+      return res.status(400).json({
+        error: "A cancellation reason between 3 and 1000 characters is required",
+        details: parsed.error.flatten()
+      });
+    }
+
     try {
       const appointmentId = String(req.params.appointmentId);
+      const userId = req.auth!.userId;
+      const role = req.auth!.role;
 
-      const updated = await inTransaction(async client => {
-        const result = await client.query(
-          `UPDATE appointment_requests
-           SET status = 'cancelled',
-               updated_at = NOW()
-           WHERE id = $1::uuid
-             AND patient_user_id = $2::uuid
-             AND status = 'pending'
-           RETURNING *`,
-          [appointmentId, req.auth!.userId]
+      const result = await inTransaction(async client => {
+
+        // 1. Find and lock the appointment.
+        // Verify that the current user owns or manages it.
+
+        const existing = await client.query(
+          `SELECT
+             a.id,
+             a.status,
+             a.requested_start_at,
+             (a.requested_start_at > NOW()) AS is_future
+
+           FROM appointment_requests a
+
+           LEFT JOIN doctor_profiles d
+             ON d.id = a.doctor_profile_id
+
+           WHERE a.id = $1::uuid
+
+             AND (
+               ($2 = 'patient'
+                 AND a.patient_user_id = $3::uuid)
+
+               OR
+
+               ($2 = 'clinician'
+  AND d.user_id = $3::uuid
+  AND d.verification_status = 'verified')
+             )
+
+           FOR UPDATE OF a`,
+          [appointmentId, role, userId]
         );
 
-        if (!result.rowCount) {
-          return null;
+        if (!existing.rowCount) {
+          return { kind: "not_found" as const };
         }
 
+        const appointment = existing.rows[0];
+
+        // 2. Only pending and accepted appointments can be cancelled.
+
+        if (!["pending", "accepted"].includes(appointment.status)) {
+          return { kind: "invalid_status" as const };
+        }
+
+        // 3. Prevent cancellation of appointments that have already started.
+
+        if (!appointment.is_future) {
+          return { kind: "appointment_started" as const };
+        }
+
+        // 4. Update cancellation information.
+
+        const updated = await client.query(
+          `UPDATE appointment_requests
+
+           SET
+             status = 'cancelled',
+             cancelled_at = NOW(),
+             cancelled_by_user_id = $1::uuid,
+             cancellation_reason = $2,
+             updated_at = NOW()
+
+           WHERE id = $3::uuid
+
+           RETURNING *`,
+          [userId, parsed.data.reason, appointmentId]
+        );
+
+        // 5. Record audit history.
+
         await audit(client, {
-          actorUserId: req.auth!.userId,
-          action: "appointment.cancelled",
+          actorUserId: userId,
+          action: `appointment.cancelled_by_${role}`,
           targetType: "appointment",
           targetId: appointmentId
         });
 
-        return result.rows[0];
+        return {
+          kind: "success" as const,
+          appointment: updated.rows[0]
+        };
       });
 
-      if (!updated) {
+      // 6. Handle different outcomes.
+
+      if (result.kind === "not_found") {
         return res.status(404).json({
-          error: "Pending appointment not found"
+          error: "Appointment not found or you do not have permission to cancel it"
+        });
+      }
+
+      if (result.kind === "invalid_status") {
+        return res.status(409).json({
+          error: "Only pending or accepted appointments can be cancelled"
+        });
+      }
+
+      if (result.kind === "appointment_started") {
+        return res.status(409).json({
+          error: "An appointment that has already started cannot be cancelled"
         });
       }
 
       return res.json({
         message: "Appointment cancelled successfully",
-        appointment: updated
+        appointment: result.appointment
       });
 
     } catch (error) {
